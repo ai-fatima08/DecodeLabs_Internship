@@ -1,0 +1,2020 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1" />
+    <title>Vulnix. System Vulnerability Checklist</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;600&family=JetBrains+Mono&display=swap"
+      rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #1c1c1c;
+        --bg2: #232323;
+        --pri: #ff6d00;
+        --sec: #ffd600;
+        --red: #d50000;
+        --tx: #fafafa;
+        --mut: #9d9d9d;
+        --ln: rgba(255, 255, 255, 0.09);
+        --glass: rgba(255, 255, 255, 0.04);
+        --grad: linear-gradient(120deg, #ff6d00, #ffd600);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 90px;
+      }
+      body {
+        background:
+          radial-gradient(
+              ellipse 70% 35% at 50% 0,
+              rgba(255, 109, 0, 0.09),
+              transparent
+            )
+            no-repeat,
+          var(--bg);
+        color: var(--tx);
+        font:
+          16px/1.7 Inter,
+          system-ui,
+          sans-serif;
+        overflow-x: hidden;
+        position: relative;
+      }
+      h1,
+      h2,
+      h3,
+      .logo {
+        font-family: Sora, Inter, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      code,
+      pre,
+      .mono {
+        font-family: 'JetBrains Mono', Consolas, monospace;
+      }
+      ::selection {
+        background: var(--pri);
+        color: #111;
+      }
+      section {
+        padding: 64px 6vw;
+        max-width: 1240px;
+        margin: auto;
+        position: relative;
+      }
+      .tag {
+        display: inline-block;
+        padding: 6px 14px;
+        border: 1px solid rgba(255, 109, 0, 0.4);
+        border-radius: 99px;
+        background: rgba(255, 109, 0, 0.08);
+        color: var(--pri);
+        font:
+          600 12px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      h2 {
+        font-size: clamp(32px, 4.6vw, 56px);
+        line-height: 1.08;
+        margin: 18px 0 18px;
+        font-weight: 700;
+      }
+      h2 span,
+      h1 span {
+        background: var(--grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .lead {
+        color: var(--mut);
+        max-width: 660px;
+        font-size: 18px;
+      }
+      nav {
+        position: fixed;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(1120px, 92vw);
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px 10px 26px;
+        background: rgba(28, 28, 28, 0.7);
+        backdrop-filter: blur(18px);
+        border: 1px solid var(--ln);
+        border-radius: 99px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: 800;
+      }
+      .logo b {
+        color: var(--pri);
+      }
+      nav ul {
+        display: flex;
+        gap: 6px;
+        list-style: none;
+      }
+      nav ul a {
+        color: var(--tx);
+        text-decoration: none;
+        font-size: 13.5px;
+        opacity: 0.75;
+        padding: 8px 14px;
+        border-radius: 99px;
+        transition: 0.25s;
+      }
+      nav ul a:hover {
+        background: var(--glass);
+        color: var(--sec);
+        opacity: 1;
+      }
+      .btn {
+        display: inline-block;
+        padding: 14px 30px;
+        border: 0;
+        border-radius: 99px;
+        background: var(--grad);
+        color: #111;
+        font: 700 14px Sora;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: 0.3s;
+        box-shadow: 0 8px 30px rgba(255, 109, 0, 0.35);
+      }
+      .btn:hover {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 16px 44px rgba(255, 109, 0, 0.55);
+      }
+      .btn.ghost {
+        background: var(--glass);
+        border: 1px solid rgba(255, 109, 0, 0.5);
+        color: var(--tx);
+        box-shadow: none;
+        backdrop-filter: blur(8px);
+      }
+      .btn.ghost:hover {
+        background: rgba(255, 109, 0, 0.15);
+      }
+      nav .btn {
+        padding: 10px 22px;
+      }
+      #hero {
+        min-height: 100vh;
+        max-width: none;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        align-items: center;
+        gap: 40px;
+        padding-top: 130px;
+        overflow: hidden;
+      }
+      #hero::before,
+      #hero::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(110px);
+        z-index: 0;
+        animation: drift 14s ease-in-out infinite alternate;
+      }
+      #hero::before {
+        width: 560px;
+        height: 560px;
+        background: rgba(255, 109, 0, 0.35);
+        top: -120px;
+        right: -80px;
+      }
+      #hero::after {
+        width: 420px;
+        height: 420px;
+        background: rgba(255, 214, 0, 0.16);
+        bottom: -100px;
+        left: 8%;
+        animation-delay: -6s;
+      }
+      @keyframes drift {
+        to {
+          transform: translate(-60px, 50px) scale(1.15);
+        }
+      }
+      #hero canvas.bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.18;
+        z-index: 0;
+      }
+      #hero > div {
+        position: relative;
+        z-index: 1;
+      }
+      h1 {
+        font-size: clamp(46px, 7.4vw, 98px);
+        line-height: 1;
+        margin: 22px 0 26px;
+        font-weight: 800;
+      }
+      h1 em {
+        font-style: normal;
+        color: var(--tx);
+      }
+      .cursor {
+        display: inline-block;
+        width: 0.45em;
+        height: 0.1em;
+        background: var(--pri);
+        margin-left: 8px;
+        animation: blink 1s steps(1) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+      .row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 34px;
+      }
+      .radar {
+        width: 100%;
+        max-width: 500px;
+        margin: auto;
+        display: block;
+        animation: float 6s ease-in-out infinite;
+        filter: drop-shadow(0 0 60px rgba(255, 109, 0, 0.4));
+      }
+      @keyframes float {
+        50% {
+          transform: translateY(-16px);
+        }
+      }
+      .sweep {
+        transform-origin: 200px 200px;
+        animation: spin 4s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .blip {
+        animation: ping 2.4s infinite;
+      }
+      @keyframes ping {
+        0% {
+          opacity: 0;
+          r: 2;
+        }
+        30% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          r: 16;
+        }
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+        width: min(1240px, 88vw);
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+      .stat {
+        background: var(--glass);
+        border: 1px solid var(--ln);
+        border-radius: 20px;
+        padding: 30px 22px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        transition: 0.3s;
+      }
+      .stat:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255, 109, 0, 0.5);
+      }
+      .stat b {
+        display: block;
+        font: 800 52px Sora;
+        background: var(--grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .stat small {
+        color: var(--mut);
+      }
+      .ticker {
+        overflow: hidden;
+        margin: 40px 0;
+        border-block: 1px solid var(--ln);
+        background: rgba(255, 109, 0, 0.06);
+        color: var(--pri);
+        font: 700 15px 'JetBrains Mono';
+        white-space: nowrap;
+        letter-spacing: 3px;
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent,
+          #000 12%,
+          #000 88%,
+          transparent
+        );
+        mask-image: linear-gradient(
+          90deg,
+          transparent,
+          #000 12%,
+          #000 88%,
+          transparent
+        );
+      }
+      .ticker div {
+        display: inline-block;
+        padding: 16px 0;
+        animation: tick 32s linear infinite;
+      }
+      @keyframes tick {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(46px) scale(0.97);
+        transition: 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      .grid {
+        display: grid;
+        gap: 22px;
+        margin-top: 36px;
+      }
+      .g2 {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+      .g3 {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+      .card,
+      .audit,
+      .panel,
+      .term,
+      .reel {
+        --mx: 50%;
+        --my: 0%;
+      }
+      .card {
+        background: var(--glass);
+        border: 1px solid var(--ln);
+        border-radius: 22px;
+        padding: 32px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.35s,
+          border-color 0.35s,
+          box-shadow 0.35s;
+        backdrop-filter: blur(10px);
+      }
+      .card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          380px circle at var(--mx) var(--my),
+          rgba(255, 109, 0, 0.18),
+          transparent 60%
+        );
+        opacity: 0;
+        transition: 0.3s;
+        pointer-events: none;
+      }
+      .card:hover::before {
+        opacity: 1;
+      }
+      .card:hover {
+        border-color: rgba(255, 109, 0, 0.55);
+        transform: translateY(-8px);
+        box-shadow:
+          0 24px 60px rgba(0, 0, 0, 0.5),
+          0 0 40px rgba(255, 109, 0, 0.12);
+      }
+      .card.bad {
+        box-shadow: inset 0 3px 0 var(--red);
+      }
+      .card.good {
+        box-shadow: inset 0 3px 0 var(--pri);
+      }
+      .card h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      .card p {
+        color: var(--mut);
+      }
+      .card li {
+        margin: 9px 0 9px 20px;
+        color: var(--mut);
+      }
+      .card li::marker {
+        color: var(--pri);
+      }
+      .num {
+        font: 800 76px Sora;
+        color: rgba(255, 109, 0, 0.12);
+        position: absolute;
+        right: 18px;
+        top: 0;
+      }
+      .flow {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        gap: 14px;
+        margin-top: 52px;
+      }
+      .flow .arrow {
+        display: flex;
+        align-items: center;
+        color: var(--pri);
+        font-size: 30px;
+        animation: nudge 1.4s infinite;
+      }
+      @keyframes nudge {
+        50% {
+          transform: translateX(8px);
+        }
+      }
+      .axiom {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 214, 0, 0.3);
+        background: rgba(255, 214, 0, 0.07);
+        color: var(--sec);
+        font-size: 14px;
+      }
+      .tabs {
+        display: inline-flex;
+        gap: 4px;
+        margin: 44px 0 24px;
+        padding: 6px;
+        background: var(--glass);
+        border: 1px solid var(--ln);
+        border-radius: 99px;
+      }
+      .tab {
+        padding: 12px 26px;
+        background: none;
+        border: 0;
+        border-radius: 99px;
+        color: var(--mut);
+        cursor: pointer;
+        font: 600 14px Sora;
+        transition: 0.3s;
+      }
+      .tab:hover {
+        color: var(--tx);
+      }
+      .tab.on {
+        background: var(--grad);
+        color: #111;
+        box-shadow: 0 6px 24px rgba(255, 109, 0, 0.4);
+      }
+      .panel {
+        display: none;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 109, 0, 0.08),
+          rgba(255, 255, 255, 0.02)
+        );
+        border: 1px solid var(--ln);
+        border-radius: 28px;
+        padding: 48px;
+        animation: fade 0.6s;
+      }
+      .panel.on {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 44px;
+        align-items: center;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+      }
+      .panel h3 {
+        font-size: 34px;
+        margin: 14px 0 10px;
+      }
+      .panel li {
+        margin: 12px 0 12px 22px;
+        color: #d6d6d6;
+      }
+      .panel li::marker {
+        color: var(--sec);
+      }
+      .compare {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 14px;
+        border: 1px solid var(--ln);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .compare td,
+      .compare th {
+        padding: 14px;
+        border-bottom: 1px solid var(--ln);
+        text-align: left;
+      }
+      .compare th {
+        background: rgba(255, 109, 0, 0.12);
+        color: var(--pri);
+      }
+      .warn {
+        color: var(--sec);
+      }
+      .ok {
+        color: #7cffb2;
+      }
+      .panel svg {
+        max-width: 340px;
+        margin: auto;
+        display: block;
+        filter: drop-shadow(0 0 24px rgba(255, 109, 0, 0.3));
+      }
+      .risk-curve path {
+        stroke-dasharray: 900;
+        stroke-dashoffset: 900;
+        transition: 2.5s;
+      }
+      .risk-curve.in path {
+        stroke-dashoffset: 0;
+      }
+      .os {
+        display: inline-flex;
+        padding: 5px;
+        background: var(--glass);
+        border: 1px solid var(--ln);
+        border-radius: 99px;
+        margin: 28px 0 0;
+      }
+      .os button {
+        padding: 11px 26px;
+        background: none;
+        border: 0;
+        border-radius: 99px;
+        color: var(--mut);
+        cursor: pointer;
+        font: 600 14px Sora;
+        transition: 0.3s;
+      }
+      .os button.on {
+        background: var(--grad);
+        color: #111;
+      }
+      .term {
+        background: #0e0e0e;
+        border: 1px solid var(--ln);
+        border-radius: 20px;
+        margin-top: 22px;
+        overflow: hidden;
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.5),
+          0 0 60px rgba(255, 109, 0, 0.08);
+      }
+      .term header {
+        display: flex;
+        gap: 8px;
+        padding: 14px 18px;
+        background: #171717;
+        border-bottom: 1px solid var(--ln);
+        align-items: center;
+      }
+      .term header i {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--red);
+      }
+      .term header i:nth-child(2) {
+        background: var(--sec);
+      }
+      .term header i:nth-child(3) {
+        background: var(--pri);
+      }
+      .trow {
+        display: grid;
+        grid-template-columns: 190px 1fr auto;
+        gap: 16px;
+        padding: 18px 24px;
+        border-bottom: 1px solid #1d1d1d;
+        align-items: center;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+      .trow:hover {
+        background: rgba(255, 109, 0, 0.06);
+      }
+      .trow code {
+        color: #ffb066;
+        word-break: break-all;
+      }
+      .copy {
+        background: var(--glass);
+        border: 1px solid var(--ln);
+        color: var(--mut);
+        padding: 7px 16px;
+        border-radius: 99px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: 0.2s;
+      }
+      .copy:hover {
+        border-color: var(--pri);
+        color: var(--pri);
+      }
+      .funnel {
+        margin: 52px auto 0;
+        max-width: 780px;
+      }
+      .tier {
+        margin: 8px auto;
+        padding: 22px 30px;
+        cursor: pointer;
+        color: #111;
+        font-weight: 600;
+        border-radius: 18px;
+        transition: 0.35s;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+      .tier:hover {
+        transform: scale(1.03);
+      }
+      .tier b {
+        font: 700 20px Sora;
+        display: block;
+      }
+      .tier p {
+        font-size: 14px;
+        max-height: 0;
+        overflow: hidden;
+        transition: 0.4s;
+      }
+      .tier.open p {
+        max-height: 90px;
+        margin-top: 8px;
+      }
+      .t1 {
+        background: linear-gradient(90deg, #d50000, #ff3d3d);
+        color: #fff;
+        width: 100%;
+        box-shadow: 0 0 40px rgba(213, 0, 0, 0.3);
+      }
+      .t2 {
+        background: linear-gradient(90deg, #ff6d00, #ff9a40);
+        width: 88%;
+      }
+      .t3 {
+        background: linear-gradient(90deg, #ffd600, #ffe766);
+        width: 76%;
+      }
+      .t4 {
+        background: linear-gradient(90deg, #8fd16f, #b7eb9d);
+        width: 64%;
+      }
+      .audit {
+        background: var(--glass);
+        border: 1px solid var(--ln);
+        border-radius: 28px;
+        padding: 40px;
+        margin-top: 44px;
+        backdrop-filter: blur(12px);
+      }
+      .gauge {
+        display: flex;
+        gap: 44px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+      }
+      .ring {
+        width: 180px;
+        height: 180px;
+        transform: rotate(-90deg);
+        filter: drop-shadow(0 0 18px rgba(255, 109, 0, 0.45));
+      }
+      .ring circle {
+        fill: none;
+        stroke-width: 12;
+      }
+      #arc {
+        stroke: var(--pri);
+        stroke-linecap: round;
+        stroke-dasharray: 440;
+        stroke-dashoffset: 440;
+        transition: 1.6s;
+      }
+      .res {
+        display: grid;
+        grid-template-columns: 130px 1fr auto;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--ln);
+        align-items: center;
+        animation: fade 0.6s both;
+      }
+      .sev {
+        padding: 4px 14px;
+        border-radius: 99px;
+        font: 700 12px Sora;
+        color: #111;
+        background: var(--sec);
+      }
+      .sev.Critical {
+        background: var(--red);
+        color: #fff;
+      }
+      .sev.High {
+        background: var(--pri);
+      }
+      .sev.Pass {
+        background: #7cffb2;
+      }
+      .sev.Unverified {
+        background: #777;
+        color: #fff;
+      }
+      .checks label {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--ln);
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .checks label:hover {
+        padding-left: 8px;
+        color: var(--sec);
+      }
+      input[type='checkbox'] {
+        accent-color: var(--pri);
+        width: 20px;
+        height: 20px;
+      }
+      .reel {
+        position: relative;
+        border: 1px solid var(--ln);
+        border-radius: 24px;
+        overflow: hidden;
+        background: #0e0e0e;
+        margin-top: 44px;
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.5),
+          0 0 60px rgba(255, 109, 0, 0.1);
+      }
+      .reel canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .reel .ctl {
+        position: absolute;
+        right: 18px;
+        top: 18px;
+        padding: 10px 22px;
+      }
+      .report {
+        background: #fafafa;
+        color: #1c1c1c;
+        padding: 40px;
+        border-radius: 12px;
+        transform: rotate(-1.5deg);
+        box-shadow:
+          0 40px 80px rgba(0, 0, 0, 0.6),
+          0 0 80px rgba(255, 109, 0, 0.2);
+        transition: 0.5s;
+      }
+      .report:hover {
+        transform: rotate(0) scale(1.02);
+      }
+      .report h4 {
+        font: 700 17px Sora;
+        color: var(--pri);
+        margin-top: 16px;
+      }
+      .report .out {
+        background: #111;
+        color: #7cffb2;
+        padding: 12px;
+        margin-top: 10px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+      .stand {
+        text-align: center;
+      }
+      .stand .base {
+        margin-top: 34px;
+        border: 1px dashed rgba(255, 109, 0, 0.6);
+        padding: 24px;
+        border-radius: 20px;
+        color: var(--sec);
+        background: rgba(255, 109, 0, 0.05);
+      }
+      .eye {
+        max-width: 400px;
+        margin: 36px auto;
+        filter: drop-shadow(0 0 30px rgba(255, 109, 0, 0.4));
+      }
+      footer {
+        border-top: 1px solid var(--ln);
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 30px;
+        color: var(--mut);
+        text-align: center;
+        width: 100%;
+        padding: 20px;
+        background: linear-gradient(transparent, rgba(255, 109, 0, 0.07));
+      }
+      footer a {
+        color: var(--tx);
+        text-decoration: none;
+      }
+      #top {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 3px;
+        background: var(--grad);
+        z-index: 99;
+        width: 0;
+        box-shadow: 0 0 14px var(--pri);
+      }
+      section > .tag {
+        display: table;
+        margin: 0 auto;
+      }
+      section > h2 {
+        text-align: center;
+        max-width: 820px;
+        margin: 20px auto 16px;
+      }
+      section > .lead {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .why {
+        max-width: 760px;
+        margin: 26px auto 0;
+        padding: 18px 24px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 214, 0, 0.25);
+        background: rgba(255, 214, 0, 0.06);
+        color: #e9e9e9;
+        font-size: 15px;
+      }
+      .why b {
+        color: var(--sec);
+      }
+      .tabs,
+      .os {
+        display: flex;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      nav ul a.on {
+        background: rgba(255, 109, 0, 0.18);
+        color: var(--sec);
+        opacity: 1;
+        box-shadow: inset 0 0 0 1px rgba(255, 109, 0, 0.5);
+      }
+      .pr {
+        opacity: 0.7;
+        margin-right: 8px;
+        user-select: none;
+      }
+      .term.win {
+        background: #012456;
+        border-color: #2a5cab;
+      }
+      .term.win header {
+        background: #1b1b1b;
+        justify-content: space-between;
+        color: #ddd;
+        font:
+          12px 'Segoe UI',
+          sans-serif;
+      }
+      .term.win .trow {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        color: #f2f2f2;
+      }
+      .term.win .trow code {
+        color: #ffff80;
+        font-family: Consolas, 'JetBrains Mono', monospace;
+      }
+      .term.win .trow:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .term.mac {
+        background: #1e1e1e;
+      }
+      .term.mac header {
+        background: #2d2d2d;
+        justify-content: center;
+        position: relative;
+        color: #aaa;
+        font:
+          12px -apple-system,
+          Inter,
+          sans-serif;
+      }
+      .term.mac header .dots {
+        position: absolute;
+        left: 16px;
+        display: flex;
+        gap: 8px;
+      }
+      .term.mac .trow code {
+        color: #7cffb2;
+      }
+      .res {
+        padding: 18px 16px;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border: 1px solid var(--ln);
+      }
+      .res.Critical {
+        background: rgba(213, 0, 0, 0.14);
+        border-color: var(--red);
+        box-shadow: 0 0 30px rgba(213, 0, 0, 0.22);
+      }
+      .res.High {
+        background: rgba(255, 109, 0, 0.12);
+        border-color: var(--pri);
+      }
+      .res.Medium {
+        background: rgba(255, 214, 0, 0.08);
+        border-color: var(--sec);
+      }
+      .res.Pass {
+        background: rgba(124, 255, 178, 0.05);
+      }
+      .found {
+        font: 700 11px 'JetBrains Mono';
+        letter-spacing: 2px;
+        color: #ff5a5a;
+        margin-bottom: 4px;
+      }
+      .res.High .found {
+        color: var(--pri);
+      }
+      .res.Medium .found {
+        color: var(--sec);
+      }
+      .res.Unverified .found {
+        color: #aaa;
+      }
+      .fix {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.35);
+        border-left: 3px solid #7cffb2;
+        font-size: 14px;
+      }
+      .fix b {
+        color: #7cffb2;
+      }
+      .fix code {
+        display: block;
+        margin: 8px 0;
+        color: #ffb066;
+        font-size: 12.5px;
+        word-break: break-all;
+      }
+      .report ul {
+        margin: 6px 0 0 20px;
+        font-size: 14px;
+      }
+      .report li {
+        margin: 5px 0;
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #rpt,
+        #rpt * {
+          visibility: visible;
+        }
+        #rpt {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          transform: none;
+          box-shadow: none;
+        }
+        .noprint {
+          display: none !important;
+        }
+      }
+      @media (max-width: 860px) {
+        nav ul {
+          display: none;
+        }
+        #hero,
+        .panel.on,
+        .flow {
+          grid-template-columns: 1fr;
+        }
+        .flow .arrow {
+          display: none;
+        }
+        .trow,
+        .res {
+          grid-template-columns: 1fr;
+        }
+        .panel {
+          padding: 28px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="top"></div>
+    <nav>
+      <div class="logo">VULN<b>IX</b></div>
+      <ul>
+        <li><a href="#why">Mindset</a></li>
+        <li><a href="#checklist">Checklist</a></li>
+        <li><a href="#toolkit">Toolkit</a></li>
+        <li><a href="#risk">Risk</a></li>
+        <li><a href="#audit">Live Audit</a></li>
+        <li><a href="#report">Report</a></li>
+        <li><a href="#standards">Standards</a></li>
+      </ul>
+      <a
+        class="btn"
+        href="#audit"
+        >Run Audit</a
+      >
+    </nav>
+
+    <section id="hero">
+      <canvas
+        class="bg"
+        id="rain"></canvas>
+      <div>
+        <h1>FIND THE <span>GAPS.</span><br /><em>CLOSE THEM</em> FIRST</h1>
+        <p class="lead">
+          Vulnix is a system vulnerability checklist platform. Audit passwords,
+          patches, network posture and user habits on your own machine, score
+          each flaw with CVSS and turn the results into a hardened system.
+        </p>
+        <div class="row">
+          <a
+            class="btn"
+            href="#audit"
+            >Start Live Audit</a
+          ><a
+            class="btn ghost"
+            href="#checklist"
+            >View the Checklist</a
+          >
+        </div>
+      </div>
+      <div>
+        <svg
+          class="radar"
+          viewBox="0 0 400 400">
+          <defs>
+            <radialGradient id="rg">
+              <stop
+                offset="0"
+                stop-color="#FF6D00"
+                stop-opacity=".55" />
+              <stop
+                offset="1"
+                stop-color="#FF6D00"
+                stop-opacity="0" />
+            </radialGradient>
+            <linearGradient
+              id="sw"
+              x1="0"
+              y1="0"
+              x2="1"
+              y2="0">
+              <stop
+                offset="0"
+                stop-color="#FF6D00"
+                stop-opacity="0" />
+              <stop
+                offset="1"
+                stop-color="#FFD600"
+                stop-opacity=".8" />
+            </linearGradient>
+          </defs>
+          <g
+            fill="none"
+            stroke="#FF6D00"
+            stroke-opacity=".5">
+            <circle
+              cx="200"
+              cy="200"
+              r="190" />
+            <circle
+              cx="200"
+              cy="200"
+              r="140" />
+            <circle
+              cx="200"
+              cy="200"
+              r="90" />
+            <circle
+              cx="200"
+              cy="200"
+              r="40" />
+            <path d="M200 10V390M10 200H390" />
+          </g>
+          <g class="sweep">
+            <path
+              d="M200 200L390 200A190 190 0 0 0 365 105Z"
+              fill="url(#sw)" />
+          </g>
+          <path
+            d="M200 118L262 142V205Q262 252 200 282Q138 252 138 205V142Z"
+            fill="#1C1C1C"
+            stroke="#FFD600"
+            stroke-width="3" />
+          <path
+            d="M172 204L194 226L232 178"
+            fill="none"
+            stroke="#FF6D00"
+            stroke-width="9"
+            stroke-linecap="round" />
+          <g fill="#D50000">
+            <circle
+              class="blip"
+              cx="310"
+              cy="120"
+              r="5" />
+            <circle
+              class="blip"
+              style="animation-delay: 0.8s"
+              cx="95"
+              cy="290"
+              r="5" />
+            <circle
+              class="blip"
+              style="animation-delay: 1.6s"
+              cx="285"
+              cy="305"
+              r="5" />
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <div class="ticker"><div id="tk"></div></div>
+    <div class="stats">
+      <div class="stat"><b data-n="4">0</b><small>Checklist steps</small></div>
+      <div class="stat"><b data-n="10">0</b><small>Max CVSS score</small></div>
+      <div class="stat">
+        <b data-n="3">0</b><small>Compliance frameworks</small>
+      </div>
+      <div class="stat">
+        <b
+          data-n="100"
+          data-s="%"
+          >0</b
+        ><small>Defensive logic</small>
+      </div>
+    </div>
+
+    <section id="why">
+      <div class="tag">01 The Shift</div>
+      <h2>From product to <span>Process</span></h2>
+      <p class="lead">
+        A system's integrity is dynamic. The security auditor is the gatekeeper
+        of organizational resilience.
+      </p>
+      <div class="why">
+        <b>In simple words:</b> Old thinking is "install an antivirus and
+        relax". Real security means checking your computer again and again,
+        because new flaws appear every week. This section teaches that habit.
+      </div>
+      <div class="grid g2">
+        <div class="card bad reveal">
+          <h3>The Legacy View</h3>
+          <p
+            class="mono"
+            style="color: var(--red)">
+            Security as a Product
+          </p>
+          <ul>
+            <li>Defending Single Components</li>
+            <li>Reactive Remediation</li>
+            <li>Assuming the Perimeter is Secure</li>
+          </ul>
+        </div>
+        <div class="card good reveal">
+          <h3>The Modern Security Mindset</h3>
+          <p
+            class="mono"
+            style="color: var(--pri)">
+            Security as a Continuous Process
+          </p>
+          <ul>
+            <li>Proactive Hunting</li>
+            <li>Assuming Constant Software Decay</li>
+            <li>Mitigating Zero-Day Exploits</li>
+            <li>Developing the Auditor's Eye</li>
+          </ul>
+        </div>
+      </div>
+      <div class="flow reveal">
+        <div class="card">
+          <span class="num">01</span>
+          <div class="tag">Input</div>
+          <h3>Establishing the Baseline</h3>
+          <p>
+            Hardware inventory, software builds, network ports and Shadow IT.
+          </p>
+          <div class="axiom">
+            You cannot secure an asset that you do not know exists.
+          </div>
+        </div>
+        <div class="arrow">&#10148;</div>
+        <div class="card">
+          <span class="num">02</span>
+          <div class="tag">Process</div>
+          <h3>Methodical Inspection</h3>
+          <p>
+            Cross-reference against the checklist: patch levels, firewall rules
+            and least privilege auditing.
+          </p>
+          <div class="axiom">
+            You cannot manage what you do not measure. Inspection turns
+            assumptions into actionable data
+          </div>
+        </div>
+        <div class="arrow">&#10148;</div>
+        <div class="card">
+          <span class="num">03</span>
+          <div class="tag">Output</div>
+          <h3>
+            Threat <br />
+            Reporting
+          </h3>
+          <p>
+            A risk-ranked vulnerability list, a remediation roadmap and
+            verification of a hardened state.
+          </p>
+          <div class="axiom">
+            A vulnerability identified but not remediated is a breach waiting to
+            happen.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="checklist">
+      <div class="tag">02 The Checklist</div>
+      <h2>Four steps to a <span>Hardened</span> System</h2>
+      <div class="why">
+        <b>Why a checklist?</b> Most hacks/attacks happen because of simple
+        mistakes like: a weak password, old software, a Guest account left on. A
+        checklist makes sure you never forget one. These 4 steps cover the most
+        common attacks.
+      </div>
+      <div
+        class="tabs"
+        id="tabs"></div>
+      <div id="panels"></div>
+    </section>
+
+    <section id="toolkit">
+      <div class="tag">03 Execution Matrix</div>
+      <h2>The auditor's <span>toolkit</span></h2>
+      <p class="lead">
+        Read-only commands you can run in a terminal to verify each control.
+        Click copy and paste.
+      </p>
+      <div class="why">
+        <b>Why commands?</b> Settings screens can hide things. A command shows
+        the real state of your system and gives you proof (the output) to paste
+        into your report. Windows and macOS use different commands, so switch
+        the tab.
+      </div>
+      <div class="os">
+        <button
+          class="on"
+          data-os="win">
+          Windows PowerShell</button
+        ><button data-os="mac">macOS Terminal</button>
+      </div>
+      <div
+        class="term win"
+        id="term">
+        <header id="th"></header>
+        <div id="rows"></div>
+      </div>
+    </section>
+
+    <section id="risk">
+      <div class="tag">04 Categorizing Risk</div>
+      <h2>The <span>CVSS</span> Funnel</h2>
+      <p class="lead">
+        Click a Tier to see what Lands in it. CVSS 4.0 Weighs Intrinsic
+        Severity, the Current Exploit Landscape and Your Organizational Context.
+      </p>
+      <div class="why">
+        <b>Why CVSS? </b> Not Every Flaw is equally Dangerous. CVSS gives each
+        Flaw a score from 0 to 10 so you Fix the Dangerous ones first. You never
+        calculate it by hand. Just remember: 9 and above is fix today, 7 to 8.9
+        is fix this week, below that can wait.
+      </div>
+      <div
+        class="funnel"
+        id="fun"></div>
+      <div class="grid g3">
+        <div class="card reveal">
+          <h3>Base</h3>
+          <p>Intrinsic Severity of the Flaw.</p>
+        </div>
+        <div class="card reveal">
+          <h3>Threat</h3>
+          <p>Current Exploit Landscape.</p>
+        </div>
+        <div class="card reveal">
+          <h3>Environmental</h3>
+          <p>Organizational Context.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="audit">
+      <div class="tag">05 Live Audit</div>
+      <h2>Audit <span>your Own</span> Machine</h2>
+      <p class="lead">
+        The Python Backend Runs Read-only checks for Passwords, Firewall,
+        Encryption, Admin Rights, Updates, Guest Account, Antivirus, UAC and
+        Remote Access. If the Server is not Running, the Manual Checklist Below
+        Still Works.
+      </p>
+      <div class="why">
+        <b>What Happens Here? </b> The Scan only Reads your Settings and Changes
+        Nothing. Every Problem is Marked Red, Orange or Yellow with a HOW-TO-FIX
+        box. Your Password Policy is Scanned, but MFA Lives on your Online
+        Accounts (Google, Microsoft), so Tick that in the Manual Checklist.
+      </div>
+      <div class="audit">
+        <div class="gauge">
+          <svg
+            class="ring"
+            viewBox="0 0 160 160">
+            <circle
+              cx="80"
+              cy="80"
+              r="70"
+              stroke="#383838" />
+            <circle
+              id="arc"
+              cx="80"
+              cy="80"
+              r="70" />
+          </svg>
+          <div>
+            <div
+              class="mono"
+              style="color: var(--mut)">
+              Hardening score
+            </div>
+            <div
+              style="font: 700 60px Rajdhani"
+              id="score">
+              0%
+            </div>
+            <button
+              class="btn"
+              id="go">
+              Run Scan
+            </button>
+            <span
+              id="sysinfo"
+              class="mono"
+              style="color: var(--mut); font-size: 13px"></span>
+          </div>
+        </div>
+        <div id="results"></div>
+      </div>
+      <div class="audit">
+        <h3 style="font-size: 26px">Manual checklist</h3>
+        <div
+          class="checks"
+          id="manual"></div>
+      </div>
+      <div class="reel">
+        <canvas
+          id="reel"
+          width="1200"
+          height="420"></canvas
+        ><button
+          class="btn ghost ctl"
+          id="pp">
+          Pause
+        </button>
+      </div>
+    </section>
+
+    <section id="report">
+      <div class="tag">06 The Deliverables</div>
+      <h2>Anatomy of the <span>Vulnerability Report</span></h2>
+      <p class="lead">
+        To pass the foundational Track you Submit a Professional one-page Report
+        on your Own Computer. You cannot Defend an Enterprise if you cannot
+        Secure your Own Perimeter.
+      </p>
+      <div
+        class="grid g2"
+        style="align-items: center">
+        <div
+          class="report"
+          id="rpt">
+          <div
+            class="mono"
+            style="font-size: 12px; color: #777">
+            VULNIX VULNERABILITY REPORT
+          </div>
+          <div id="rptbody">
+            <p style="margin-top: 14px">
+              Run a Scan in the Live Audit Section and this Report Writes Itself
+              from your Results.
+            </p>
+          </div>
+          <div class="row noprint">
+            <button
+              class="btn"
+              id="rpdf">
+              Print / Save as PDF</button
+            ><button
+              class="btn ghost"
+              id="rtxt"
+              style="color: #1c1c1c">
+              Download .txt
+            </button>
+          </div>
+        </div>
+        <div
+          class="grid"
+          style="margin: 0">
+          <div class="card reveal">
+            <h3>Flaws</h3>
+            <p>Evidence from Commands, Rated Critical to Low.</p>
+          </div>
+          <div class="card reveal">
+            <h3>Fixes</h3>
+            <p>Reproducible Steps, not Theory.</p>
+          </div>
+          <div class="card reveal">
+            <h3>Proof</h3>
+            <p>Terminal Output After Hardening.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="standards"
+      class="stand">
+      <div class="tag">07 PROFESSIONAL BENCHMARKS</div>
+      <h2>The <span> Professional Standard </span></h2>
+      <p
+        class="lead"
+        style="margin: auto">
+        Startups and large corporations use legally binding versions of this
+        exact checklist to prove their security posture to global governments.
+      </p>
+      <div
+        class="why"
+        style="margin: 26px auto 0; text-align: left">
+        <b>What and Why?</b> ISO 27001, SOC 2, and CIS are official rulebooks
+        that companies follow to prove they are secure. Your small checklist is
+        the same idea at a small scale (or foundational level), so what you do
+        here is what professional auditors do at a company scale. It shows
+        employers you understand real standards
+      </div>
+      <div class="grid g3">
+        <div class="card reveal">
+          <h3>ISO 27001:2022</h3>
+          <p>
+            Configuration Management & Monitoring Activities. <br />
+            Managing secure configurations and monitoring system activities.
+          </p>
+        </div>
+        <div class="card reveal">
+          <h3>SOC 2</h3>
+          <p>
+            Access Controls & System Operations. <br />
+            Ensuring only authorized access and maintaining system patching.
+          </p>
+        </div>
+        <div class="card reveal">
+          <h3>CIS Controls v8</h3>
+          <p>
+            Asset Inventory & Control. <br />
+            Knowing exactly what hardware and software exists on your network.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="eye"
+      style="text-align: center">
+      <div class="tag">08 Looking Ahead</div>
+      <h2>The <span>Human Element </span>  in Security </h2>
+      <svg
+        class="eye"
+        viewBox="0 0 300 160">
+        <path
+          d="M10 80Q150 -20 290 80Q150 180 10 80Z"
+          fill="none"
+          stroke="#FF6D00"
+          stroke-width="4" />
+        <circle
+          cx="150"
+          cy="80"
+          r="40"
+          fill="none"
+          stroke="#FFD600"
+          stroke-width="3"
+          stroke-dasharray="8 6"
+          class="sweep"
+          style="transform-origin: 150px 80px" />
+        <circle
+          id="pupil"
+          cx="150"
+          cy="80"
+          r="20"
+          fill="#de5e00" />
+      </svg>
+      <p
+        class="lead"
+        style="margin: auto">
+        Tools can identify that a port is open, but only a human auditor can
+        determine if it is a business necessity or a dangerous exception. Master
+        these basics today. Stay one step ahead in the digital war.
+      </p>
+    </section>
+
+    <footer>
+      <div>
+        <div class="logo">VULN<b>IX</b></div>
+        <p> 
+          Cyber Security Internship Project 4, Coded by S Fatima Maznoor.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      const $ = (s) => document.querySelector(s),
+        $$ = (s) => [...document.querySelectorAll(s)];
+      // progress bar + reveal + counters
+      addEventListener(
+        'scroll',
+        () =>
+          ($('#top').style.width =
+            (scrollY / (document.body.scrollHeight - innerHeight)) * 100 + '%'),
+      );
+      const io = new IntersectionObserver(
+        (es) =>
+          es.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          }),
+        { threshold: 0.15 },
+      );
+      $$('.reveal').forEach((e) => io.observe(e));
+      const co = new IntersectionObserver((es) =>
+        es.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const b = e.target,
+            n = +b.dataset.n;
+          let i = 0;
+          const t = setInterval(() => {
+            i += Math.max(1, (n / 40) | 0);
+            if (i >= n) {
+              i = n;
+              clearInterval(t);
+            }
+            b.textContent = i + (b.dataset.s || '');
+          }, 35);
+          co.unobserve(b);
+        }),
+      );
+      $$('[data-n]').forEach((e) => co.observe(e));
+      $('#tk').innerHTML =
+        'PATCH EARLY &nbsp;//&nbsp; LEAST PRIVILEGE &nbsp;//&nbsp; ENABLE MFA &nbsp;//&nbsp; ENCRYPT DISKS &nbsp;//&nbsp; DISABLE GUEST &nbsp;//&nbsp; VERIFY FIREWALL &nbsp;//&nbsp; '.repeat(
+          6,
+        );
+      // hero rain
+      (() => {
+        const c = $('#rain'),
+          x = c.getContext('2d');
+        let cols, d;
+        const f = () => {
+          c.width = c.offsetWidth;
+          c.height = c.offsetHeight;
+          cols = (c.width / 16) | 0;
+          d = Array(cols)
+            .fill(0)
+            .map(() => (Math.random() * c.height) / 16);
+        };
+        f();
+        addEventListener('resize', f);
+        setInterval(() => {
+          x.fillStyle = 'rgba(28,28,28,.12)';
+          x.fillRect(0, 0, c.width, c.height);
+          x.font = '14px monospace';
+          d.forEach((y, i) => {
+            x.fillStyle = Math.random() > 0.9 ? '#FFD600' : '#FF6D00';
+            x.fillText(Math.random() > 0.5 ? '1' : '0', i * 16, y * 16);
+            d[i] = y * 16 > c.height && Math.random() > 0.97 ? 0 : y + 1;
+          });
+        }, 60);
+      })();
+      // checklist tabs
+      const steps = [
+        [
+          'Identity Front Door',
+          'Passwords and multi-factor authentication',
+          [
+            'Password types: a short complex password (weak) versus a long passphrase of 4+ random words (strong). The passphrase wins.',
+            'MFA types, weakest to strongest: SMS or voice code, authenticator app (6-digit code), push approval, then passkey or FIDO2 security key (best).',
+            'Retire SMS and voice codes: they can be intercepted or abused through MFA fatigue.',
+          ],
+          '<table class="compare"><tr><th></th><th>Legacy</th><th>NIST 800-63B</th></tr><tr><td>Passwords</td><td class="warn">Complex rules, forced expiry</td><td class="ok">Long passphrases</td></tr><tr><td>MFA</td><td class="warn">SMS / voice codes</td><td class="ok">FIDO2 / Passkeys</td></tr></table>',
+        ],
+        [
+          'Software Decay',
+          'Patch management',
+          [
+            'Verify automated OS updates are enforced.',
+            'Find unpatched browsers and out-of-date antivirus databases.',
+            'Hunt Shadow IT: unapproved apps bypassing restrictions.',
+          ],
+          '<svg class="risk-curve" id="rc" viewBox="0 0 300 180"><path d="M10 165C120 160 200 140 245 20L246 165" fill="none" stroke="#FF6D00" stroke-width="4"/><circle cx="246" cy="20" r="6" fill="#FFD600"/><text x="20" y="20" fill="#FAFAFA" font-size="12">Delaying an update is accepting a risk</text></svg>',
+        ],
+        [
+          'Human Perimeter',
+          'Misconfigurations and behavior',
+          [
+            'Disable the Guest account to stop reconnaissance and privilege escalation.',
+            'Check for lingering admin memberships and enforce least privilege.',
+            'Verify screen lock timeouts, no sticky-note credentials, no rogue USB devices.',
+            'Treat deepfake and cloned voices as real threats: verify via trusted channels.',
+          ],
+          '<svg viewBox="0 0 300 180"><rect x="60" y="30" width="180" height="105" rx="8" fill="none" stroke="#FF6D00" stroke-width="3"/><rect x="40" y="145" width="220" height="14" rx="4" fill="#FFD600"/><circle cx="150" cy="82" r="22" fill="none" stroke="#D50000" stroke-width="4"/><path d="M150 70V84M150 90V92" stroke="#D50000" stroke-width="4"/></svg>',
+        ],
+        [
+          'Network and Endpoint',
+          'Firewall and disk encryption',
+          [
+            'The Shield: verify the OS firewall is active and blocking unauthorized inbound traffic.',
+            'On macOS, enable the Application Firewall and Stealth Mode.',
+            'The Vault: verify FileVault on macOS and BitLocker with TPM on Windows.',
+          ],
+          '<svg viewBox="0 0 300 180"><path d="M80 20L140 40V100Q140 130 80 150Q20 130 20 100V40Z" fill="none" stroke="#FF6D00" stroke-width="4"/><rect x="170" y="70" width="110" height="80" rx="8" fill="none" stroke="#FFD600" stroke-width="4"/><path d="M190 70V50a35 35 0 0 1 70 0V70" fill="none" stroke="#FFD600" stroke-width="4"/></svg>',
+        ],
+      ];
+      steps.forEach((s, i) => {
+        $('#tabs').insertAdjacentHTML(
+          'beforeend',
+          `<button class="tab ${i ? '' : 'on'}" data-i="${i}">Step ${i + 1}</button>`,
+        );
+        $('#panels').insertAdjacentHTML(
+          'beforeend',
+          `<div class="panel ${i ? '' : 'on'}"><div><div class="tag">Step ${i + 1} of 4</div><h3>${s[0]}</h3><p class="lead">${s[1]}</p><ul>${s[2].map((l) => `<li>${l}</li>`).join('')}</ul></div><div>${s[3]}</div></div>`,
+        );
+      });
+      $$('.tab').forEach(
+        (t) =>
+          (t.onclick = () => {
+            $$('.tab,.panel').forEach((e) => e.classList.remove('on'));
+            t.classList.add('on');
+            $$('.panel')[t.dataset.i].classList.add('on');
+            const r = $('#rc');
+            r.classList.remove('in');
+            setTimeout(() => r.classList.add('in'), 50);
+          }),
+      );
+      setTimeout(() => $('#rc').classList.add('in'), 500);
+      // toolkit
+      const kit = [
+        [
+          'Verify Firewall',
+          'Get-NetFirewallProfile',
+          '/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate',
+        ],
+        ['Check Encryption', 'Get-BitLockerVolume', 'fdesetup status'],
+        [
+          'Audit Admin Rights',
+          'Get-LocalGroupMember -Group Administrators',
+          'dscl . -read /Groups/admin',
+        ],
+        [
+          'Find Shadow IT',
+          'Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*',
+          'ls /Applications',
+        ],
+        ['Search for Updates', 'Get-WUList', 'softwareupdate -l'],
+      ];
+      let os = 0;
+      const draw = () => {
+        $('#rows').innerHTML = kit
+          .map(
+            (k) =>
+              `<div class="trow"><span>${k[0]}</span><code><span class="pr">${os ? 'user@mac ~ %' : 'PS C:\\>'}</span>${k[os + 1]}</code><button class="copy">Copy</button></div>`,
+          )
+          .join('');
+        $$('.copy').forEach(
+          (b, i) =>
+            (b.onclick = () => {
+              navigator.clipboard &&
+                navigator.clipboard.writeText(kit[i][os + 1]);
+              b.textContent = 'Copied';
+              setTimeout(() => (b.textContent = 'Copy'), 1200);
+            }),
+        );
+        $('#term').className = 'term ' + (os ? 'mac' : 'win');
+        $('#th').innerHTML = os
+          ? '<span class="dots"><i></i><i></i><i></i></span><span>Terminal &mdash; zsh &mdash; 80x24</span>'
+          : '<span>&#9654; Windows PowerShell</span><span>&#8212; &nbsp; &#9633; &nbsp; &#10005;</span>';
+      };
+      draw();
+      $$('.os button').forEach(
+        (b, i) =>
+          (b.onclick = () => {
+            $$('.os button').forEach((x) => x.classList.remove('on'));
+            b.classList.add('on');
+            os = i;
+            draw();
+          }),
+      );
+      // funnel
+      [
+        [
+          'Critical Risk (CVSS 9.0 - 10.0)',
+          'Unauthenticated remote code execution, databases without passwords. Fix immediately.',
+        ],
+        ['High Risk', 'Unpatched browsers, lack of MFA on admin accounts.'],
+        [
+          'Medium Risk',
+          'Missing security headers, overly permissive local permissions.',
+        ],
+        [
+          'Low Risk',
+          "Outdated non-essential apps, such as an intern's music app.",
+        ],
+      ].forEach((t, i) => {
+        $('#fun').insertAdjacentHTML(
+          'beforeend',
+          `<div class="tier t${i + 1}"><b>${t[0]}</b><p>${t[1]}</p></div>`,
+        );
+      });
+      $$('.tier').forEach(
+        (t) => (t.onclick = () => t.classList.toggle('open')),
+      );
+      // manual checklist
+      [
+        'Passphrase of 14+ characters in use',
+        'Phishing-resistant MFA enabled',
+        'Automatic OS updates enforced',
+        'Browser and antivirus up to date',
+        'Guest account disabled',
+        'Admin group reviewed',
+        'Screen lock timeout set',
+        'Firewall active',
+        'Disk encrypted',
+      ].forEach((t) =>
+        $('#manual').insertAdjacentHTML(
+          'beforeend',
+          `<label><input type="checkbox"> ${t}</label>`,
+        ),
+      );
+      const setScore = (p) => {
+        $('#score').textContent = p + '%';
+        $('#arc').style.strokeDashoffset = 440 - (440 * p) / 100;
+        $('#arc').style.stroke =
+          p < 50 ? '#D50000' : p < 80 ? '#FFD600' : '#FF6D00';
+      };
+      $$('.checks input').forEach(
+        (c) =>
+          (c.onchange = () =>
+            setScore(
+              Math.round(($$('.checks input:checked').length / 9) * 100),
+            )),
+      );
+      const scans = [];
+      const pct = (d) =>
+        Math.round(
+          (d.results.filter((r) => r.severity === 'Pass').length /
+            d.results.length) *
+            100,
+        );
+      function renderReport() {
+        const f = scans[0],
+          l = scans[scans.length - 1],
+          bad = f.results.filter(
+            (r) => r.severity !== 'Pass' && r.severity !== 'Unverified',
+          ),
+          un = f.results.filter((r) => r.severity === 'Unverified');
+        const li = (a) =>
+          a
+            .map(
+              (r) =>
+                `<li><b style="text-transform:capitalize">${r.check}</b> (${r.severity}, CVSS ${r.cvss}): ${r.note}</li>`,
+            )
+            .join('') || '<li>No confirmed flaws found.</li>';
+        $('#rptbody').innerHTML =
+          `<p class="mono" style="font-size:12px;color:#555;margin-top:8px">${f.os} ${f.release} | ${f.host} | ${new Date().toLocaleString()}<br>Hardening score: ${pct(f)}%${scans.length > 1 ? ' to ' + pct(l) + '%' : ''}</p>
+<h4>Section 1: Flaws Found (The Diagnosis)</h4><ul>${li(bad)}${un.length ? '<li>Not verified (needs Administrator): ' + un.map((r) => r.check).join(', ') + '</li>' : ''}</ul>
+<h4>Section 2: Remediation Actions (The Treatment)</h4><ul>${bad.map((r) => `<li>${r.fix.text}${r.fix.cmd ? '<div class="out mono">' + r.fix.cmd + '</div>' : ''}</li>`).join('') || '<li>Nothing to fix.</li>'}</ul>
+<h4>Section 3: Hardened Verification (The Proof)</h4>${scans.length > 1 ? '<ul>' + l.results.map((r) => `<li>${r.severity === 'Pass' ? '[OK]' : '[!!]'} <b style="text-transform:capitalize">${r.check}</b>: ${r.note}</li>`).join('') + '</ul>' : '<p>Apply the fixes, then press Run Scan again. The new results appear here as proof.</p>'}`;
+      }
+      $('#rpdf').onclick = () => print();
+      $('#rtxt').onclick = () => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(
+          new Blob([$('#rptbody').innerText], { type: 'text/plain' }),
+        );
+        a.download = 'vulnix-report.txt';
+        a.click();
+      };
+      // live audit
+      $('#go').onclick = async () => {
+        const R = $('#results');
+        R.innerHTML = '<p class="mono">Scanning...</p>';
+        let d;
+        try {
+          d = await (await fetch('/api/audit')).json();
+        } catch (e) {
+          R.innerHTML =
+            '<p class="mono warn">Backend not reachable. Start it with: python app.py, then open http://localhost:8000. Use the manual checklist meanwhile.</p>';
+          return;
+        }
+        $('#sysinfo').textContent = d.os + ' ' + d.release + ' | ' + d.host;
+        R.innerHTML = d.results
+          .map(
+            (r, i) =>
+              `<div class="res ${r.severity}" style="animation-delay:${i * 0.2}s"><b style="text-transform:capitalize">${r.check}</b><div>${r.severity === 'Pass' ? '' : '<div class="found">' + (r.severity === 'Unverified' ? 'NOT VERIFIED' : 'VULNERABILITY FOUND') + '</div>'}${r.note}${r.severity === 'Unverified' ? '' : `<div class="mono" style="color:var(--mut);font-size:12px">${r.output.replace(/</g, '&lt;')}</div>`}${r.fix ? `<div class="fix"><b>How to fix:</b> ${r.fix.text}${r.fix.cmd ? `<code>${r.fix.cmd}</code><button class="copy" data-c="${r.fix.cmd.replace(/"/g, '&quot;')}">Copy</button>` : ''}</div>` : ''}</div><span class="sev ${r.severity}">${r.severity}${r.cvss ? ' ' + r.cvss : ''}</span></div>`,
+          )
+          .join('');
+        $$('#results .copy').forEach(
+          (b) =>
+            (b.onclick = () => {
+              navigator.clipboard && navigator.clipboard.writeText(b.dataset.c);
+              b.textContent = 'Copied';
+            }),
+        );
+        scans.push(d);
+        renderReport();
+        const ok = d.results.filter((r) => r.severity === 'Pass').length,
+          un = d.results.filter((r) => r.severity === 'Unverified').length;
+        setScore(Math.round((ok / d.results.length) * 100));
+        if (un)
+          R.insertAdjacentHTML(
+            'afterbegin',
+            `<p class="mono warn" style="margin-bottom:10px">${un} check(s) could not be verified and count as not passed. Run the terminal as Administrator and scan again.</p>`,
+          );
+      };
+      // scan reel (animated canvas video)
+      (() => {
+        const c = $('#reel'),
+          x = c.getContext('2d');
+        let t = 0,
+          run = true;
+        const L = [
+          '[SYS_INIT] Establishing baseline... OK',
+          '[AUTH] Loading Blue Team protocols... OK',
+          '[SCAN] Firewall profile .......... ACTIVE',
+          '[SCAN] Disk encryption ........... ON',
+          '[SCAN] Guest account ............. DISABLED',
+          '[WARN] Updates pending ........... 3 FOUND',
+          '[CVSS] Score 7.2 ................. HIGH',
+          '[FIX ] Install pending updates ... APPLIED',
+          '[DONE] System hardened.',
+        ];
+        $('#pp').onclick = (e) => {
+          run = !run;
+          e.target.textContent = run ? 'Pause' : 'Play';
+        };
+        (function f() {
+          if (run) t++;
+          x.fillStyle = '#0f0f0f';
+          x.fillRect(0, 0, 1200, 420);
+          x.strokeStyle = '#222';
+          for (let i = 0; i < 1200; i += 40) {
+            x.beginPath();
+            x.moveTo(i, 0);
+            x.lineTo(i, 420);
+            x.stroke();
+          }
+          const n = Math.min(L.length, ((t / 45) | 0) % (L.length + 4));
+          x.font = '22px monospace';
+          L.slice(0, n).forEach((l, i) => {
+            const bad = l.includes('WARN') || l.includes('CVSS');
+            if (bad) {
+              x.fillStyle = 'rgba(213,0,0,.28)';
+              x.fillRect(24, 34 + i * 38, 1150, 34);
+            }
+            x.fillStyle = bad
+              ? '#ff6b6b'
+              : l.includes('DONE') || l.includes('FIX')
+                ? '#7CFFB2'
+                : '#FF6D00';
+            x.fillText(l, 40, 60 + i * 38);
+          });
+          const y = (t * 4) % 420;
+          const g = x.createLinearGradient(0, y - 60, 0, y);
+          g.addColorStop(0, 'rgba(255,109,0,0)');
+          g.addColorStop(1, 'rgba(255,109,0,.35)');
+          x.fillStyle = g;
+          x.fillRect(0, y - 60, 1200, 60);
+          requestAnimationFrame(f);
+        })();
+      })();
+      const links = $$('nav ul a'),
+        secs = links.map((a) => $(a.getAttribute('href')));
+      const spy = () => {
+        let c = -1;
+        secs.forEach((s, i) => {
+          if (s.getBoundingClientRect().top < innerHeight * 0.4) c = i;
+        });
+        links.forEach((a, i) => a.classList.toggle('on', i === c));
+      };
+      addEventListener('scroll', spy);
+      spy();
+      // card spotlight
+      $$('.card').forEach((c) =>
+        c.addEventListener('mousemove', (e) => {
+          const r = c.getBoundingClientRect();
+          c.style.setProperty('--mx', e.clientX - r.left + 'px');
+          c.style.setProperty('--my', e.clientY - r.top + 'px');
+        }),
+      );
+      // eye follows cursor
+      addEventListener('mousemove', (e) => {
+        const p = $('#pupil');
+        p.setAttribute('cx', 150 + (e.clientX / innerWidth - 0.5) * 30);
+        p.setAttribute('cy', 80 + (e.clientY / innerHeight - 0.5) * 16);
+      });
+    </script>
+  </body>
+</html>
